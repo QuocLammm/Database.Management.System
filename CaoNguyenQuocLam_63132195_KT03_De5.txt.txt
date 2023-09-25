@@ -1,0 +1,101 @@
+-----------Họ và tên: Cao Nguyễn Quốc Lâm---
+---MSSV: 63.CNTT-4----------
+--------------------------------------Đề 5----------------------------
+
+Câu 1:
+begin
+declare @contro cursor;
+set @contro = cursor For
+select  nv.HONV + ' ' + nv.TENLOT+ ' ' + nv.TENNV ,nql.HONV + ' ' + nql.TENLOT+ ' ' + nql.TENNV 
+from NHANVIEN nv
+oin NHANVIEN nql on nv.MANV = nql.MA_NQL
+open @contro;
+--Tạo biến
+	declare @maso int;
+	declare @hoten nvarchar(50);
+	declare @hotenql nvarchar(50);
+	declare @stt int=1; --them so thu tu
+	fetch next from @contro into @maso, @hoten, @hotenql;
+	while (@@FETCH_STATUS = 0)
+		begin
+			print convert(varchar(3),@stt) +'.'+  ' Họ và tên: ' + @hoten ;
+			print '.'+  ' Họ và tên quản lí: ' + @hotenql ;
+			Set @stt+=1;
+			fetch next from @contro into @maso, @hoten, @hotenql;
+		end;
+	close @contro;
+	deallocate @contro;
+end;
+
+----------------------------------------------------------------------
+Câu 2:
+BEGIN TRANSACTION;
+-- Tạo phòng ban mới
+INSERT INTO PHONGBAN
+VALUES (10,'An Ninh',80,'2023-12-09');
+
+-- Tạo nhân viên mới và đặt làm trưởng phòng
+INSERT INTO NHANVIEN(manv,HONV,TENLOT,TENNV, PHG) 
+VALUES (201,N'Cao',null, N'Da',10);
+DECLARE @id_nhan_vien int;
+SET @id_nhan_vien = SCOPE_IDENTITY();
+
+-- Cập nhật thông tin của phòng ban
+UPDATE PHONGBAN 
+SET TRPHG = @id_nhan_vien 
+WHERE MAPHG = '10'
+COMMIT TRANSACTION;
+
+------------------------------------------
+Câu 3:
+CREATE TRIGGER tr_phongban_kiemsoat_tuoi
+ON PHONGBAN
+AFTER INSERT
+AS
+BEGIN
+    IF EXISTS (
+        SELECT *
+        FROM inserted i
+        JOIN NHANVIEN nv ON i.TRPHG = nv.MA_NQL
+        WHERE DATEDIFF(YEAR, nv.NGAYSINH, GETDATE()) < 30
+    )
+    BEGIN
+        RAISERROR('Truong phong phai co tuoi tren 30', 16, 1)
+        ROLLBACK TRANSACTION
+    END
+END
+go
+enable trigger tr_phongban_kiemsoat_tuoi
+on PHONGBAN
+---------------------------------------------
+Câu 4:
+CREATE PROCEDURE GetProjectCountByDepartment(@MAPHG int)
+AS
+BEGIN
+    SELECT 
+        pb.TENPHG, 
+        CONCAT(tp.HONV, ' ', tp.TENLOT, ' ', tp.TENNV) AS TEN_TRUONG_PHONG, 
+        count(da.MADA) AS SO_LUONG_DE_AN
+    FROM PHONGBAN pb
+    JOIN NHANVIEN tp ON pb.TRPHG = tp.MA_NQL
+    LEFT JOIN NHANVIEN nv ON pb.MAPHG = nv.PHG	
+    LEFT JOIN PHANCONG pc ON nv.MANV = pc.MA_NVIEN
+    LEFT JOIN DEAN da ON pc.SODA = da.MADA
+    WHERE pb.TRPHG = @MAPHG
+    GROUP BY pb.TENPHG, tp.HONV, tp.TENLOT, tp.TENNV;
+END
+
+EXEC GetProjectCountByDepartment @MAPHG = '10'
+--------------------------------
+
+Câu 5:
+CREATE PROCEDURE counttn @MAPHG varchar(10)
+AS
+BEGIN
+    SELECT COUNT(*) AS soluongNV
+    FROM Nhanvien
+    WHERE PHG = @MAPHG;
+END
+
+EXEC counttn @MAPHG = 2;
+----------------

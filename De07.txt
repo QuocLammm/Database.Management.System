@@ -1,0 +1,115 @@
+Cao Nguyễn Quốc Lâm
+63.CNTT-4
+----------------------------------------------------------
+Câu 1:
+create database QuanLyKho_CaoNguyenQuocLam
+----------------------------------------------------------
+Câu 2:
+CREATE LOGIN admin_QuocLam WITH PASSWORD = '100603', CHECK_POLICY = OFF;
+USE QuanLyKho_CaoNguyenQuocLam;
+GO
+CREATE USER user_QuocLam FOR LOGIN admin_QuocLam;
+USE QuanLyKho_CaoNguyenQuocLam;
+GO
+GRANT CREATE TABLE TO user_QuocLam;
+GRANT CREATE VIEW TO user_QuocLam;
+GRANT ALTER TO user_QuocLam;
+GRANT SELECT, INSERT, UPDATE, DELETE TO user_QuocLam;
+----------------------------------------------------------
+Câu 3:
+create table NhanVien(
+	MaNV	VARCHAR(50) PRIMARY KEY,
+	Ho		VARCHAR(100),
+	Ten		VARCHAR(20),
+	DiaChi	VARCHAR(100),
+	SDT		NUMERIC(10,0),
+	Email	VARCHAR(50),
+);
+GO
+INSERT INTO NhanVien VALUES
+('NV01','Cao Nguyen', 'Quoc Lam', 'Cam Lam - Khanh Hoa','0911992209','quoclam@gmail.com'),
+('NV02','Nguyen Thiet', ' Duy Dan', 'Nha Trang - Khanh Hoa','0911900000','dan@gmail.com'),
+('NV03','Le', ' Minh Thanh', 'Nha Trang - Khanh Hoa','0966575778','thanh@gmail.com');
+GO
+create table HangHoa(
+	MaHang	VARCHAR(50) PRIMARY KEY,
+	TenHang	VARCHAR(80),
+	XuatXu	VARCHAR(30),
+	NgayNhap	DATE,
+	SoLuongT	INT,
+);
+INSERT INTO HangHoa VALUES
+('T101','Thep loai 1','Viet Nam','2022-12-06',5),
+('XM02','Xi Mang','Nhat Ban','2020-10-06',15),
+('AL01','Nhom loai 1','Viet Nam','2021-12-16',10);
+Go
+create table GiaoDich(
+	MaNV	VARCHAR(50),
+	MaHang	VARCHAR(50) ,
+	NgayXuat	DATE,
+	SoLuongX	INT,
+	PRIMARY KEY (MaNV, MaHang, NgayXuat),
+	CONSTRAINT FK_SV FOREIGN KEY (MaNV) REFERENCES NhanVien (MaNV),
+    CONSTRAINT FK_MH FOREIGN KEY (MaHang) REFERENCES HangHoa (MaHang)
+);
+go
+INSERT INTO GiaoDich VALUES
+('NV01','T101','2022-5-06',3),
+('NV02','XM02','2020-8-06',10),
+('NV03','AL01','2021-12-16',7);
+----------------------------------------------------------
+Câu 4:
+create schema abc
+ALTER SCHEMA abc TRANSFER dbo.NhanVien
+----------------------------------------------------------
+Câu 5:
+SELECT MaNV, Ho,Ten, DiaChi
+FROM abc.NhanVien
+WHERE DiaChi LIKE '%Khanh Hoa%'
+----------------------------------------------------------
+Câu 6:
+SELECT MaNV, SUM(SoLuongX) AS Tongsoluongxuatkho
+FROM GiaoDich
+WHERE YEAR(NgayXuat) = 2022
+GROUP BY MaNV
+
+----------------------------------------------------------
+Câu 7:
+UPDATE HangHoa
+SET SoLuongT =SoLuongT + 10000
+WHERE XuatXu like '%Viet Nam%'
+
+----------------------------------------------------------
+Câu 8:
+SELECT MaNV, Ho, Ten
+FROM abc.NhanVien
+WHERE NOT EXISTS (
+  SELECT *
+  FROM GiaoDich
+  WHERE MaNV = NhanVien.MaNV AND YEAR(NgayXuat) = 2022
+----------------------------------------------------------
+Câu 9:
+a/
+BACKUP DATABASE QuanLyKho_CaoNguyenQuocLam
+TO DISK = 'D:\BACKUP\QuanLyKho_CaoNguyenQuocLam_full.bak'
+
+//0:01 Thứ 3
+BACKUP DATABASE QuanLyKho_CaoNguyenQuocLam
+TO DISK = 'D:\BACKUP\QuanLyKho_CaoNguyenQuocLam_diff.bak'
+WITH DIFFERENTIAL
+
+// 0:01 Thứ 6
+BACKUP DATABASE QuanLyKho_CaoNguyenQuocLam
+TO DISK = 'D:\BACKUP\QuanLyKho_CaoNguyenQuocLam_diff.bak'
+WITH DIFFERENTIAL
+
+//6:00-12:00-18:00
+alter database[QuanLyKho_CaoNguyenQuocLam] SET RECOVERY FULL
+
+BACKUP LOG QuanLyKho_CaoNguyenQuocLam
+TO DISK = 'D:\BACKUP\TransactionLogs'
+b/
+
+----------------------------------------------------------
+-----------------------------------Hết----------------------------------
+

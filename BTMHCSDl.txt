@@ -1,0 +1,1219 @@
+Phần 2:
+1.
+A.Create database QuanLyDeAn
+ON PRIMARY (
+    NAME = QuanLyDeAn_data,
+    FILENAME = 'D:\CaoNguyenQuocLam\QuanLyDeAn_Data.mdf',
+    SIZE = 20MB,
+    MAXSIZE = 40MB,
+    FILEGROWTH = 1MB
+)
+LOG ON (
+    NAME = QuanLyDeAn_Log,
+    FILENAME = 'D:\CaoNguyenQuocLam\QuanLyDeAn_Log.ldf',
+    SIZE = 6MB,
+    MAXSIZE = 8MB,
+    FILEGROWTH = 1MB
+);
+
+3.
+a.CREATE DATABASE QuanLyDeAn 
+  ON PRIMARY (
+ NAME = QuanLyDeAn_data1,
+ FILENAME = 'D:\CaoNguyenQuocLam\QuanLyDeAn_data2.mdf',
+ SIZE = 10MB,
+ MAXSIZE = 40MB,
+ FILEGROWTH = 1MB
+)
+ LOG ON
+ (NAME = QuanLyDeAn_Log,
+ FILENAME = 'D:\CaoNguyenQuocLam\QuanLyDeAn1.ldf',
+ SIZE = 6MB,
+ MAXSIZE = 8MB,
+ FILEGROWTH = 1MB
+);
+
+b. sp_helpdb QuanLyDeAn
+  - xem kích thước: sp_spaceused QuanLyDeAn
+
+c. ALTER DATABASE QuanLyDeAn 
+ADD FILEGROUP DuLieu
+
+d. ALTER DATABASE QuanLyDeAn
+ADD FILE (
+    NAME = QuanLyDeAn_data2,
+    FILENAME = 'E:\CaoNguyenQuocLam\QuanLyDeAn_data2.ndf',
+    SIZE = 100MB,   -- Kích thước file mới
+    MAXSIZE = UNLIMITED,  -- Kích thước tối đa
+    FILEGROWTH = 50MB  -- Mức tăng trưởng file
+)
+TO FILEGROUP QuanLyDeAn
+
+e. Thủ tục hệ thống sp_helpfilegroup được sử dụng để xem thông tin chi tiết về các filegroup trong một cơ sở dữ liệu (CSDL) trong SQL Server.
+Việc sử dụng sp_helpfilegroup có thể giúp cho người quản trị CSDL có thể kiểm tra thông tin về các filegroup trong CSDL của họ, như các tập tin
+dữ liệu và tập tin nhật ký được gán vào các filegroup cụ thể, trạng thái hiện tại của các filegroup và các thuộc tính khác của chúng.
+
+f. * Để cấu hình cho CSDL QuanLyDeAn có thuộc tính là Read_Only:
+	ALTER DATABASE QuanLyDeAn
+	SET READ_ONLY
+* Để xem lại thuộc tính của CSDL QuanLyDeAn, ta có thể sử dụng thủ tục hệ thống sp_helpdb như sau:
+	sp_helpdb QuanLyDeAn
+* Để hủy bỏ thuộc tính Read_Only của CSDL QuanLyDeAn:
+	ALTER DATABASE QuanLyDeAn
+	SET READ_WRITE
+
+g. *Để tăng SIZE của tập tin QuanLyDeAn_data1 lên 50 MB bằng lệnh ALTER DATABASE:
+	ALTER DATABASE QuanLyDeAn 
+	MODIFY FILE (NAME = QuanLyDeAn_data1, SIZE = 50MB); 
+ *Tương tự, để tăng SIZE của tập tin QuanLyDeAn_log lên 10 MB:
+	ALTER DATABASE QuanLyDeAn 
+	MODIFY FILE (NAME = QuanLyDeAn_log, SIZE = 10MB);
+*Nếu muốn thay đổi SIZE của các tập tin trong Management Studio, ta có thể làm như sau:
+	-Chọn cơ sở dữ liệu cần thay đổi.
+	-Chuột phải vào cơ sở dữ liệu đó, chọn Properties.
+	-Chọn Files trong danh sách bên trái.
+-Tại đây, ta có thể thay đổi SIZE của các tập tin dữ liệu và log bằng cách sửa đổi giá trị trong cột "Initial Size" hoặc "Autogrowth/Maxsize". Sau đó, nhấn OK để lưu thay đổi.
+
+
+	 *Module 2: 
+1. Tạo CSDL có tên_QuanLyDeAn_TenSV trong thư mục tùy ý:
+USE master;
+GO
+CREATE DATABASE QuanLyDeAn_CaoNguyenQuocLam
+ON PRIMARY
+(NAME = QuanLyDeAn_CaoNguyenQuocLam_data1,
+    FILENAME = 'D:\HQTCSDL\QuanLyDeAn_CaoNguyenQuocLam_data1.mdf',
+    SIZE = 10MB,
+    MAXSIZE = 40MB,
+    FILEGROWTH = 1MB)
+LOG ON
+(NAME = QuanLyDeAn_CaoNguyenQuocLam_log,
+    FILENAME = 'D:\HQTCSDL\QuanLyDeAn_CaoNguyenQuocLam_log.ldf',
+    SIZE = 6MB,
+    MAXSIZE = 8MB,
+    FILEGROWTH = 1MB);
+GO
+------------------------------
++++++++++++Bảng 1:+++++++++=
+CREATE TABLE NHANVIEN (
+    MANV	VARCHAR(9) PRIMARY KEY,
+    HOSV	NVARCHAR(15),
+    TENLOT	NVARCHAR(30),
+	TENNV	NVARCHAR(30),
+	NGSINH	SMALLDATETIME,
+	DCHI	NVARCHAR(150),
+	PHAI	NVARCHAR(3),
+	LUONG	NUMERIC(18,0),
+	MA_NQL	VARCHAR(9),
+	PHG		VARCHAR(2),
+	CONSTRAINT FK_MA_N_V FOREIGN KEY (MANV) REFERENCES NHANVIEN (MANV),
+	CONSTRAINT FK_NVI FOREIGN KEY (PHG) REFERENCES PHONGBAN (MAPHG),
+
+);
+
+go
+INSERT INTO NHANVIEN VALUES
+(001, N'Nguyễn', N'Văn', N'Nam',12/12/1955, N'Nha Trang', N'Nam', 18000000, 012,2),
+(012, N'Nguyễn', N'Thị', N'Ngàn',10/12/1990, N'Hà Nội', N'Nữ', 15000000, 012,5),
+(015, N'Trần', N'Anh', N'Tuấn',2/12/1945, N'TP HCM', N'Nam', 10000000, 001,5),
+(013, N'Lê', N'Thanh', N'Sang',10/12/1990, N'Hà Nội', N'Nữ', 300000, 012,5),
+(014, N'Trần', N'Anh', N'Tuấn',2/12/1945, N'TP HCM', N'Nam', 10000000, 015,3),
+(015, N'Nguyễn', N'Thị', N'Ngàn',10/12/1990, N'Hà Nội', N'Nữ', 15000000, 012,5),
+(016, N'Trần', N'Anh', N'Tuấn',2/12/1945, N'TP HCM', N'Nam', 10000000, 001,1);
+-----------------------------------------------------------------------------------------------
+CREATE TABLE DEAN(
+	MADA		VARCHAR(2) PRIMARY KEY,
+	TENDA		NVARCHAR(50),
+	DDIEM_DA	NVARCHAR(20),
+	PHONG		VARCHAR(20),
+);
+go
+INSERT INTO DEAN VALUES
+(8,N'Nghiên cứu khoa học',N'Tp.HCM',5),
+(9,N'Kinh Tế thị trường',N'Hà Nội',5),
+(11,N'Kỹ thuật phầm mềm',N'Khánh Hòa',1),
+(12,N'Xây dựng nhà máy chế biến thủy sản',N'Tp.HCM', 2),
+(13,N'Kỹ thuật',N'Hà Nội',3);
+GO
+-----------------------------------------
+CREATE TABLE PHANCONG(
+	MA_NVIEN	VARCHAR(9),
+	SODA		VARCHAR(2),
+	THOIGIAN	NUMERIC(18,0),
+	PRIMARY KEY(MA_NVIEN, SODA),
+	CONSTRAINT FK_NVIEN FOREIGN KEY (MA_NVIEN) REFERENCES NHANVIEN (MANV),
+	CONSTRAINT FK_SDA FOREIGN KEY (SODA) REFERENCES DEAN (MADA),
+);
+go
+INSERT INTO PHANCONG VALUES
+(001,12,100),
+(012,20,10),
+(015,10,20),
+(001,13,20);
+--------------------------------------------
+CREATE TABLE THANNHAN(
+MA_NVIEN	VARCHAR(9),
+TENTN		VARCHAR(20),
+NGSINH		SMALLDATETIME,
+PHAI		VARCHAR(3),
+QUANHE		VARCHAR(15),
+PRIMARY KEY(MA_NVIEN,TENTN),
+CONSTRAINT FK_NVI FOREIGN KEY (MA_NVIEN) REFERENCES NHANVIEN (MANV),
+);
+---------------------------------------------------------------
+CREATE TABLE PHONGBAN(
+MAPHG			VARCHAR(2) PRIMARY KEY,
+TENPHG			NVARCHAR(20),
+TRPHG			NVARCHAR(20),
+NG_NHANCHUC		SMALLDATETIME,
+);
+GO
+INSERT INTO PHONGBAN VALUES
+(1,N'Nghiên cứu',N'Trưởng phòng',12),
+(2,N'Kỹ thuật',N'Thực tập',22),
+(3,N'Kế toán',N'Thực tập',2),
+(4,N'Sinh học',N'Trưởng phòng',8),
+(5,N'Sinh học',N'Trưởng phòng',12);
+
+--------------------------------------------------
+CREATE TABLE DIADIEM_PHG(
+MAPHG	VARCHAR(2),
+DIADIEM	VARCHAR(20),
+PRIMARY KEY(MAPHG,DIADIEM),
+CONSTRAINT FK_PHONG_BAN FOREIGN KEY (MAPHG) REFERENCES PHONGBAN (MAPHG),
+);
+
+2.
+a.
+b.
+-- Định nghĩa datatype cho cột ISBN
+EXEC sp_addtype ISBD, 'char(25)'
+
+-- Định nghĩa datatype cho cột SoDienThoai
+EXEC sp_addtype SoDienThoai, 'char(13)', NULL
+
+-- Định nghĩa datatype cho cột Shortstring
+EXEC sp_addtype Shortstring, 'char(15)', NULL
+
+c.Các user-defined datatype (UDT) được định nghĩa trong SQL Server được lưu trữ trong CSDL hiện hành (current database),
+và chỉ có thể sử dụng trong phạm vi của CSDL đó.
+
+d.
+
+e.Nếu bạn muốn sử dụng User-Defined datatype (UDT) trong tất cả các CSDL trong SQL Server, bạn có thể tạo nó trong hệ thống cơ sở dữ liệu master.
+
+f.
+USE QuanLyDeAn;
+GO
+
+CREATE TABLE Nhanvien_Backup (
+    MaNV INT CONSTRAINT PK_Nhanvien_Backup PRIMARY KEY CHECK (MaNV >= 1 AND MaNV <= 1000),
+    HoTen Shortstring NOT NULL,
+    NgaySinh DATE,
+    Phai VARCHAR(10),
+    DienThoai SoDienThoai UNIQUE,
+    ThanhPho VARCHAR(50) DEFAULT 'Hồ Chí Minh' 
+);
+
+g. Xóa: DROP TYPE SoDienThoai;
+Nếu muốn xóa kiểu dữ liệu SoDienThoai, cần phải xóa các ràng buộc này trước. Nếu không,
+ SQL Server sẽ trả về lỗi khi bạn cố gắng xóa kiểu dữ liệu đó.
+
+3.
+a. ALTER TABLE Nhanvien_Backup
+    ADD CONSTRAINT CHK_PhailValue CHECK (Phai IN ('Nam', 'Nữ'));
+
+b. ALTER TABLE Nhanvien_Backup
+    ADD CONSTRAINT CHK_NgaySinh CHECK (NgaySinh <= DATEADD(year, -18, GETDATE()));
+
+c.CREATE RULE rule_LUONG
+AS
+    @LUONG > 0
+GO
+EXEC sp_bindrule 'rule_luong', 'NHANVIEN.LUONG'
+
+d.ALTER TABLE DEAN
+   ADD CONSTRAINT DF_DDIEM_DA DEFAULT 'Tp.Hồ Chí Minh' FOR DDIEM_DA
+
+--------------------------------
+Modul 3:
+Phần 1: 
+2. 
+*Hiệu chỉnh kiểu dữ liệu cho cột TENPHG thành nvarchar(20):
+	ALTER TABLE PHONGBAN
+	ALTER COLUMN TENPHG nvarchar(20)
+*Thêm vào bảng PhongBan:
+	INSERT INTO PHONGBAN(MAPHG, TENPHG, TRPHG, NG_NHANCONG)
+	VALUES (2, N'Nhân sự', 10, '2003/12/12')
+
+3.
+INSERT INTO DEAN(MADA, TENDA, DDIEM_DA, PHONG) 
+VALUES
+(6,  'Kế Toán', 'Hà Nội','Nghiên cứu'),
+(7,  'Kỹ Thuật', 'TP.HCM', 'Thủy Lợi');
+
+
+4.
+INSERT INTO DEAN(MADA, TENDA, DDIEM_DA, PHONG) 
+VALUES 
+(8,  'DeAn 8', 'Hà Nội','Nghiên cứu'),
+(9,  'DeAn 9', 'TP.HCM', 'Thủy Lợi'),
+(11, 'DeAn 11', 'Nha Trang', 'Kinh tế'),
+(12, 'DeAn 12', 'Đà Nẵng', 'Nông Nghiệp'),
+(13, 'DeAn 13', 'Hà Nội', 'Nghiên cứu'),
+(14, 'DeAn 14', 'TP.HCM', 'Nghiên cứu'),
+(15, 'DeAn 15', 'Nha Trang', 'Kinh tế');
+
+5.Nhập bằng edit
+6.
+use QuanLyDeAn
+go
+INSERT INTO nhanvien (manv, HONV, tenlot, tennv)
+SELECT 
+    CustomerID AS manv, 
+    FirstName AS honv, 
+    MiddleName AS tenlot, 
+    LastName AS tennv 
+FROM 
+    AdventureWorks2022.Sales.Customer 
+    INNER JOIN AdventureWorks2022.Person.Person
+    ON Customer.CustomerID = Person.BusinessEntityID
+WHERE 
+    CustomerID BETWEEN 102 AND 200;
+------------
+Phần 2: Câu lệnh
+1.
+UPDATE NHANVIEN
+SET DCHI = 'Tp.Hồ Chí Minh'
+WHERE DCHI IS NULL;
+
+2.
+update NHANVIEN
+set PHG = 2
+where MANV between 1 and 10
+update NHANVIEN
+set PHG = 6
+where MANV between 11 and 40
+update NHANVIEN
+set PHG = 7
+where MANV between 41 and 80
+update NHANVIEN
+set PHG = 5
+where MANV between 102 and 200
+select MANV,PHG from NHANVIEN
+
+3.
+UPDATE NHANVIEN
+SET NGAYSINH = '1985-01-01'
+WHERE NGAYSINH is null
+
+4. Cập nhật lương
+-- Update LUONG for employees 
+UPDATE NHANVIEN
+SET LUONG = 100000
+WHERE PHG = 3;
+
+UPDATE NHANVIEN
+SET LUONG = 65000
+WHERE PHG = 6;
+
+UPDATE NHANVIEN
+SET LUONG = 85000
+WHERE PHG = 7;
+
+UPDATE NHANVIEN
+SET LUONG = 70000
+WHERE PHG = 2;
+
+select PHG from NHANVIEN
+select LUONG from NHANVIEN
+
+5.
+UPDATE NHANVIEN
+SET MA_NQL = (
+  SELECT MA_NQL
+  FROM PHONGBAN
+  WHERE PHONGBAN.MAPHG = Nhanvien.PHG
+)
+WHERE EXISTS (
+  SELECT *
+  FROM PhongBan
+  WHERE PhongBan.MAPHG = Nhanvien.PHG
+);
+-------------------
+Phần 3: Câu lệnh SELECT
+3.1: Truy vấn cơ bản:
+	1.SELECT * FROM NhanVien WHERE NHANVIEN.PHG = 5;
+	2.SELECT * FROM NhanVien WHERE NHANVIEN.LUONG > 25000
+	3.SELECT * FROM NhanVien WHERE Phg = 2 AND Luong >= 70000
+	4.SELECT HONV, TENLOT, TENNV FROM Nhanvien WHERE DCHI = N'Tp.Ho Chí Minh'
+	5.SELECT HONV, TENLOT, TENNV  FROM Nhanvien WHERE HONV LIKE 'N%'
+	6.SELECT NGAYSINH, DCHI
+	   FROM NHANVIEN
+	   WHERE HONV = 'Lê' AND TENLOT = 'Minh' AND TENNV = 'Tính'
+	7.SELECT *
+	   FROM NHANVIEN
+	   WHERE YEAR(NGAYSINH) BETWEEN 1955 AND 1975;
+	8.SELECT HONV, TENLOT, TENNV, NGAYSINH FROM NHANVIEN
+	9.SELECT HONV + ' ' + TENLOT + ' ' + TENNV AS 'Họ và tên', 
+       	   DATEDIFF(day, NGAYSINH, GETDATE()) / 365 AS 'Tuổi'
+	   FROM NHANVIEN
+3.2:Truy vấn sử dụng kết nối:
+	0.SELECT TENPHG, TRPHG
+	FROM PHONGBAN;
+	1.SELECT PhongBan.TENPHG,PHONGBAN.TRPHG, NHANVIEN.MA_NQL, NhanVien.HONV + ' ' + NhanVien.TENLOT + ' ' + NhanVien.TENNV AS TEN_TP
+	FROM PhongBan
+	JOIN NhanVien ON PhongBan.MAPHG = NhanVien.PHG
+	WHERE NhanVien.MA_NQL = PHONGBAN.TRPHG
+	2.SELECT TENNV, DCHI
+	FROM NHANVIEN
+	INNER JOIN PHONGBAN ON NHANVIEN.PHG = PHONGBAN.TENPHG
+	WHERE TENPHG ='Điều hành'
+	3.USE QuanLyDeAn
+	GO
+	SELECT Dean.TENDA, PHONGBAN.TENPHG, NHANVIEN.HONV, NHANVIEN.TENLOT, NHANVIEN.TENNV, PHONGBAN.NG_NHANCHUC
+	FROM DEAN
+	JOIN PHONGBAN ON DEAN.MADA = PHONGBAN.MAPHG
+	JOIN NHANVIEN ON PHONGBAN.MAPHG= NHANVIEN.MANV
+	WHERE DEAN.DDIEM_DA = N'Nha Trang'
+	4.SELECT NHANVIEN.TENNV, THANNHAN.TENTN
+	FROM NHANVIEN
+	JOIN THANNHAN ON NHANVIEN.MANV = THANNHAN.MA_NVIEN
+	WHERE NHANVIEN.PHAI = N'Nữ'
+	5.
+	use master
+	go
+	SELECT 
+   	CONCAT(p.FirstName, ' ', COALESCE(p.MiddleName + ' ', '') ,p.LastName) AS 'Ten Nhan Vien',
+    	CONCAT(m.FirstName, ' ', COALESCE(m.MiddleName + ' ', '') ,m.LastName) AS 'Ten Quan Ly'
+	FROM 
+   	 AdventureWorks2022.HumanResources.Employee e
+   	INNER JOIN AdventureWorks2022.Person.Person p ON e.BusinessEntityID = p.BusinessEntityID
+    	LEFT JOIN AdventureWorks2022.HumanResources.Employee m ON e.BusinessEntityID = m.BusinessEntityID;
+
+	6.
+	SELECT nhanvien.TENNV , NHANVIEN.CHUCVU
+	FROM nhanvien
+  	JOIN  dean ON nhanvien.MANV = dean.MADA
+  	JOIN phongban ON dean.PHONG = phongban.MAPHG
+  	JOIN nhanvien quanly ON DEAN.idQL = quanly.MA_NQL
+	WHERE phongban.TENPHG = 'Nhân sự' AND dean.TENDA = 'Kinh tế';
+	7.
+	SELECT NV.TENNV, NV.MA_NQL, PB.TENPHG AS TENPHG_QUANLY
+	FROM Nhanvien NV
+	INNER JOIN Phongban PB ON NV.PHG = PB.MAPHG --ok--
+	INNER JOIN Phancong PC ON NV.MANV = PC.MA_NVIEN --ok--
+	INNER JOIN Dean D ON PC.SODA = D.MADA --ok--
+	WHERE PB.MAPHG = '5' AND D.TENDA = N'Xây dựng nhà máy chế biến thủy sản'
+	8.
+	SELECT D.TENDA
+	FROM Dean D
+	INNER JOIN Phancong PC ON D.MADA = PC.SODA
+	INNER JOIN Nhanvien NV ON PC.MA_NVIEN = NV.MANV
+	WHERE HONV =N'Trần' AND TENLOT = N'Anh' AND TENNV = N'Tuấn'
+
+I.Gom nhóm:
+19.
+use QuanLyDeAn
+go
+SELECT COUNT(*) AS 'SL Đề án'
+FROM DEAN;
+
+20.
+SELECT COUNT(*) AS SoLuongDeanNghiencuu
+FROM Dean d
+JOIN Phongban p ON d.phong = p.MAPHG
+WHERE p.TENPHG =N'Nghiên cứu';
+
+21.
+use QuanLyDeAn
+go
+SELECT AVG(LUONG) AS Lương_trung_bình
+FROM Nhanvien
+WHERE PHAI = N'Nam'
+
+22.
+use QuanLyDeAn
+go
+SELECT COUNT(*) as so_than_nhan
+FROM ThanNhan
+WHERE MA_NVIEN = (
+  SELECT MANV
+  FROM Nhanvien
+  WHERE HONV = N'Lê' AND TENLOT = N'Thanh' AND TENNV = N'Sang'
+)
+
+23.
+use QuanLyDeAn
+go
+SELECT Dean.TENDA, SUM(Phancong.THOIGIAN) AS TongGioLamViec
+FROM Dean 
+INNER JOIN Phancong ON Dean.MADA = Phancong.SODA
+GROUP BY Dean.TENDA;
+
+24.
+use QuanLyDeAn
+go
+SELECT Dean.TENDA, COUNT(*) AS SoNhanVien
+FROM Dean JOIN Phancong ON Dean.MADA = Phancong.SODA
+GROUP BY Dean.TENDA
+
+25
+SELECT NV.HOSV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS 'Ho ten', COUNT(TN.MA_NVIEN) AS 'So luong than nhan'
+FROM Nhanvien NV
+LEFT JOIN ThanNhan TN ON NV.MANV = TN.MA_NVIEN
+GROUP BY NV.MANV, NV.HOSV, NV.TENLOT, NV.TENNV
+
+26.
+SELECT NV.HONV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS 'Tên nhân viên', COUNT(PC.MA_NVIEN) AS 'Số lượng đề án'
+FROM Nhanvien NV
+LEFT JOIN Phancong PC ON NV.MANV = PC.MA_NVIEN
+GROUP BY NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV
+
+27.
+SELECT NV.TENNV, COUNT(*) AS SoLuongNhanVienQuanLy
+FROM Nhanvien NV
+WHERE 
+	EXISTS (
+	SELECT * 
+	FROM Nhanvien 
+	WHERE MANV = NV.MA_NQL
+	)
+GROUP BY NV.TENNV 
+
+28.
+SELECT Phongban.TENPHG, AVG(Nhanvien.LUONG) AS LƯƠNG_TRUNG_BÌNH
+FROM Phongban
+INNER JOIN Nhanvien ON Phongban.MAPHG = Nhanvien.PHG
+GROUP BY Phongban.TENPHG;
+
+29.
+SELECT TENPHG, COUNT(*) AS SO_LUONG_NHAN_VIEN
+FROM Nhanvien JOIN Phongban ON Nhanvien.PHG = Phongban.MAPHG
+GROUP BY TENPHG
+HAVING AVG(LUONG) > 30000;
+
+30.
+SELECT Phongban.TENPHG, COUNT(Dean.MADA) AS 'So_luong_de_an'
+FROM Phongban
+INNER JOIN Dean ON Phongban.MAPHG = Dean.phong
+GROUP BY Phongban.TENPHG;
+
+31.
+SELECT pb.TENPHG, nv.HONV + ' ' + nv.TENLOT + ' ' + nv.TENNV AS TRUONGPHONG, COUNT(d.MADA) AS SO_LUONG_DE_AN
+FROM Phongban pb
+JOIN Nhanvien nv ON nv.PHG = pb.MAPHG
+JOIN Dean d ON d.phong = pb.MAPHG
+GROUP BY pb.TENPHG, nv.HONV, nv.TENLOT, nv.TENNV
+
+32.
+SELECT pb.TENPHG, COUNT(DISTINCT d.MADA) AS So_luong_de_an
+FROM Phongban pb
+INNER JOIN Dean d ON pb.MAPHG = d.phong
+INNER JOIN Nhanvien nv ON pb.MAPHG = nv.PHG
+INNER JOIN Phancong pc ON nv.MANV = pc.MA_NVIEN
+GROUP BY pb.TENPHG
+HAVING AVG(nv.LUONG) > 50000
+
+33.
+SELECT Diadiem_phg.diadiem, COUNT(*) AS 'So_de_an'
+FROM Dean
+JOIN Phongban ON Dean.phong = Phongban.MAPHG
+JOIN Diadiem_phg ON Phongban.MAPHG = Diadiem_phg.maphg
+GROUP BY Diadiem_phg.diadiem;
+
+34.
+SELECT dean.TENDA, COUNT(phancong.soda) as so_luong_cong_viec
+FROM dean JOIN phancong ON dean.MADA = phancong.SODA
+GROUP BY dean.TENDA
+
+35.
+
+SELECT phancong.soda, COUNT(*) AS soluong
+FROM phancong
+WHERE phancong.soda IN (
+    SELECT dean.MADA
+    FROM dean
+    WHERE dean.MADA = 20
+)
+GROUP BY phancong.soda;
+--------------------------------------------------------------------------------------------------------------------------
+3.3 TRUY VẤN LỒNG + GOM NHÓM 
+
+36.
+SELECT MADA
+FROM Dean
+WHERE MADA IN (SELECT MANV FROM Nhanvien WHERE HOSV = N'Lê')
+UNION
+SELECT MADA
+FROM Dean
+WHERE phong IN (SELECT MAPHG FROM Phongban WHERE TRPHG = N'Lê')
+
+37.
+SELECT HONV, TENLOT, TENNV
+FROM Nhanvien
+WHERE MANV IN (
+  SELECT MA_NVIEN
+  FROM ThanNhan
+  GROUP BY MA_NVIEN
+  HAVING COUNT(*) > 2
+)
+
+38.
+use QuanLyDeAn
+go
+--------- create table------
+create table NHANVIEN(
+	MANV varchar(9) not null,
+	HONV nvarchar(15),
+	TENLOT nvarchar(30),
+	TENNV nvarchar(30),
+	NGAYSINH SMALLDATETIME,
+	DCHI nvarchar(150),
+	PHAI NVARCHAR(3),
+	LUONG NUMERIC(18,0),
+	MA_NQL VARCHAR(9),
+	PHG VARCHAR(2),
+	primary key (MANV),
+	FOREIGN KEY (MA_NQL) REFERENCES NHANVIEN(MANV)
+)
+ALTER TABLE NHANVIEN ADD
+FOREIGN KEY (PHG) REFERENCES PHONGBAN(MAPHG)
+Go
+------create table Phongban----
+use QuanLyDeAn
+go
+CREATE TABLE PHONGBAN(
+	MAPHG VARCHAR(2) NOT NULL PRIMARY KEY,
+	TENPHG NVARCHAR(20),
+	TRPHG VARCHAR(9),
+	NG_NHANCHUC SMALLDATETIME,
+	FOREIGN KEY (TRPHG) REFERENCES NHANVIEN(MANV)
+)
+go
+-------create table Dean-----
+CREATE TABLE DEAN(
+	MADA VARCHAR(2) NOT NULL PRIMARY KEY,
+	TENDA NVARCHAR(50),
+	DDIEM_DA VARCHAR(20),
+	PHONG VARCHAR(2),
+)
+go
+---------create table Phân công --------
+CREATE TABLE PHANCONG(
+	MA_NVIEN VARCHAR(9) NOT NULL,
+	SODA VARCHAR(2) NOT NULL,
+	THOIGIAN NUMERIC(18,0),
+	PRIMARY KEY(MA_NVIEN,SODA),
+	FOREIGN KEY (MA_NVIEN) REFERENCES NHANVIEN(MANV),
+	FOREIGN KEY (SODA) REFERENCES DEAN(MADA)
+)
+go
+---------create table Thân nhân----------
+CREATE TABLE THANNHAN(
+	MA_NVIEN VARCHAR(9) NOT NULL,
+	TENTN VARCHAR(20) NOT NULL,
+	NGAYSINH SMALLDATETIME,
+	PHAI NVARCHAR(3),
+	QUANHE VARCHAR(15)
+	PRIMARY KEY(MA_NVIEN,TENTN),
+	FOREIGN KEY (MA_NVIEN) REFERENCES NHANVIEN(MANV)
+)
+go
+-----------create table địa điểm phòng---
+CREATE TABLE DIADIEM_PHG(
+	MAPHG VARCHAR(2) NOT NULL,
+	DIADIEM VARCHAR(20) NOT NULL,
+	PRIMARY KEY(MAPHG,DIADIEM),
+	FOREIGN KEY (MAPHG) REFERENCES PHONGBAN(MAPHG)
+)
+-----------------------------------------------------------------------------------------------
+----Tạo User-defined datatype trong CSDL QuanLyDeAn--
+use QuanLyDeAn
+go
+EXEC sp_addtype ISBN, 'char(25)';
+EXEC sp_addtype Sodienthoai, 'char(13)',NULL;
+EXEC sp_addtype Shortstring , 'varchar(15)';
+----Xem liệt kê User-defined datatype----
+SELECT domain_name, data_type, character_maximum_length
+FROM information_schema.domains
+ORDER BY domain_name;
+----Cho User-defined datatype được dùng trên tất cả CSDL----
+use master
+go
+create schema datatype
+go
+CREATE TYPE datatype.ISBN FROM char(25) NOT NULL;
+CREATE TYPE datatype.Sodienthoai FROM char(13) NULL;
+CREATE TYPE datatype.Shortstring FROM varchar(15) NOT NULL;
+go
+SELECT sys.types.name, sys.types.schema_id, sys.schemas.name
+FROM sys.types JOIN sys.schemas
+ON sys.types.schema_id = sys.schemas.schema_id
+WHERE sys.types.name = 'Shortstring';
+go
+---------------------------------------------------
+USE QuanLyDeAn
+GO
+CREATE TABLE Nhanvien_Backup (
+    MaNV INT PRIMARY KEY CHECK (MaNV >= 1 AND MaNV <= 1000),
+    HoTen Shortstring NOT NULL,
+    NgaySinh DATE,
+    Phai nvarchar(3),
+    DienThoai Sodienthoai UNIQUE,
+    ThanhPho Shortstring DEFAULT 'Hồ Chí Minh'
+);
+--Ràng buộc chỉ có Nam|Nữ--
+ALTER TABLE Nhanvien_Backup
+ADD CONSTRAINT chk_Phail CHECK (Phai IN ('Nam', 'Nữ'));
+--Ngày Sinh--
+ALTER TABLE Nhanvien_Backup
+ADD CONSTRAINT ngaysinh_check CHECK (NgaySinh <= DATEADD(YEAR, -18, GETDATE()))
+--Tạo Rule--
+go
+CREATE RULE rule_luong
+AS @Luong > 0;
+go
+EXEC sp_bindrule 'rule_luong', 'Nhanvien.Luong'
+go
+use QuanLyDeAn
+go
+ALTER TABLE DIADIEM_PHG
+ADD CONSTRAINT diadiem_default DEFAULT 'Tp.Hồ Chí Minh' FOR DIADIEM
+--------------------- Backup | restore ----------------------------------
+BACKUP DATABASE QuanLyDeAn
+TO DISK = 'E:\Quanlydean.bak'
+WITH FORMAT, INIT, SKIP;
+--restore--
+USE master;
+ALTER DATABASE QuanLyDeAn SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+RESTORE DATABASE QuanLyDeAn
+FROM DISK = 'E:\Quanlydean.bak'
+WITH REPLACE, RECOVERY;
+ALTER DATABASE QuanLyDeAn SET MULTI_USER;
+--------------------------------------------------------------------------
+--Hiệu chỉnh cột trong bảng--
+use QuanLyDeAn
+go
+ALTER TABLE PHONGBAN
+ALTER COLUMN TENPHG nvarchar(20)
+go
+INSERT INTO PHONGBAN(MAPHG, TENPHG, TRPHG, NG_NHANCHUC)
+VALUES (2, N'Nhân sự', 10, '2003/12/12')
+insert into PHONGBAN 
+values(6,N'Kế Toán',20,'2005/10/23'),
+(7,N'Kỹ Thuật',30,'2006/12/05')
+select * from PHONGBAN
+go
+-- Thêm mã nhân viên từ 10 -> 50--
+DECLARE @start INT = 1;
+DECLARE @end INT = 80;
+WHILE (@start <= @end)
+BEGIN
+	INSERT INTO NHANVIEN (MANV) VALUES (@start);
+	SET @start = @start + 1;
+END
+select MANV from NHANVIEN
+-- Thêm 50 dòng vào PHANCONG--
+use QuanLyDeAn
+go
+INSERT INTO PHANCONG (MA_NVien, SODA, THOIGIAN)
+VALUES 
+('10', '8', 10),
+('10', '9', 20),
+('10', '11', 30),
+('10', '12', 40),
+('10', '13', 50),
+('10', '14', 60),
+('10', '15', 70),
+('11', '8', 80),
+('11', '9', 90),
+('11', '11', 100),
+('11', '12', 110),
+('11', '13', 120),
+('11', '14', 130),
+('11', '15', 140),
+('12', '8', 150),
+('12', '9', 160),
+('12', '11', 170),
+('12', '12', 180),
+('12', '13', 190),
+('12', '14', 200),
+('12', '15', 210),
+('13', '8', 220),
+('13', '9', 230),
+('13', '11', 240),
+('13', '12', 250),
+('13', '13', 260),
+('13', '14', 270),
+('13', '15', 280),
+('14', '8', 290),
+('14', '9', 300),
+('14', '11', 310),
+('14', '12', 320),
+('14', '13', 330),
+('14', '14', 340),
+('14', '15', 350),
+('15', '8', 360),
+('15', '9', 370),
+('15', '11', 380);
+---------------------------------------Customer của CSDL AdventureWorks. ---------------------
+use QuanLyDeAn
+go
+INSERT INTO nhanvien (manv, HONV, tenlot, tennv)
+SELECT 
+    CustomerID AS manv, 
+    FirstName AS honv, 
+    MiddleName AS tenlot, 
+    LastName AS tennv 
+FROM 
+    AdventureWorks2022.Sales.Customer 
+    INNER JOIN AdventureWorks2022.Person.Person
+    ON Customer.CustomerID = Person.BusinessEntityID
+WHERE 
+    CustomerID BETWEEN 102 AND 200;
+--------------------- Phần 2: UPDATE -----------------------
+UPDATE NHANVIEN
+SET DCHI = 'Tp.Hồ Chí Minh'
+WHERE DCHI IS NULL;
+
+-----------------Cập nhật PHG-------
+update NHANVIEN
+set PHG = 2
+where MANV between 1 and 10
+update NHANVIEN
+set PHG = 6
+where MANV between 11 and 40
+update NHANVIEN
+set PHG = 7
+where MANV between 41 and 80
+update NHANVIEN
+set PHG = 5
+where MANV between 102 and 200
+select MANV,PHG from NHANVIEN
+
+----------------Cập nhật ngày sinh------------
+UPDATE NHANVIEN
+SET NGAYSINH = '1985-01-01'
+WHERE NGAYSINH is null
+
+-----------Cập nhật Lương-------
+UPDATE NHANVIEN
+SET LUONG = 100000
+WHERE PHG = 3;
+
+UPDATE NHANVIEN
+SET LUONG = 65000
+WHERE PHG = 6;
+
+UPDATE NHANVIEN
+SET LUONG = 85000
+WHERE PHG = 7;
+
+UPDATE NHANVIEN
+SET LUONG = 70000
+WHERE PHG = 2;
+
+select PHG from NHANVIEN
+select LUONG from NHANVIEN
+
+-------------Cập nhật mã người quản lý---------
+UPDATE NHANVIEN
+SET MA_NQL = (
+  SELECT MA_NQL
+  FROM PHONGBAN
+  WHERE PHONGBAN.MAPHG = Nhanvien.PHG
+)
+WHERE EXISTS (
+  SELECT *
+  FROM PhongBan
+  WHERE PhongBan.MAPHG = Nhanvien.PHG
+);
+
+-----------------Phần 3: Câu lệnh SELECT------------
+-----3.1 TRUY VẤN CƠ BẢN---
+--1--
+SELECT * FROM NhanVien WHERE NHANVIEN.PHG = 5;
+--2--
+SELECT * FROM NhanVien WHERE NHANVIEN.LUONG > 25000
+--3--
+SELECT * FROM NhanVien WHERE Phg = 2 AND Luong >= 70000
+--4--
+SELECT HONV, TENLOT, TENNV FROM Nhanvien WHERE DCHI = N'Tp.Ho Chí Minh'
+--5--
+SELECT HONV, TENLOT, TENNV  FROM Nhanvien WHERE HONV LIKE 'N%'
+--6--
+SELECT NGAYSINH, DCHI
+	   FROM NHANVIEN
+	   WHERE HONV = 'Lê' AND TENLOT = 'Minh' AND TENNV = 'Tính'
+--7--
+SELECT *
+	   FROM NHANVIEN
+	   WHERE YEAR(NGAYSINH) BETWEEN 1955 AND 1975;
+--8--
+SELECT HONV, TENLOT, TENNV, NGAYSINH FROM NHANVIEN
+--9--
+SELECT HONV + ' ' + TENLOT + ' ' + TENNV AS 'Họ và tên', 
+       	   DATEDIFF(day, NGAYSINH, GETDATE()) / 365 AS 'Tuổi'
+	   FROM NHANVIEN
+
+-----3.2:Truy vấn sử dụng kết nối:--------
+--0--
+SELECT TENPHG, TRPHG FROM PHONGBAN;
+--1--
+SELECT PhongBan.TENPHG,PHONGBAN.TRPHG, NHANVIEN.MA_NQL, NhanVien.HONV + ' ' + NhanVien.TENLOT + ' ' + NhanVien.TENNV AS TEN_TP
+	FROM PhongBan
+	JOIN NhanVien ON PhongBan.MAPHG = NhanVien.PHG
+	WHERE NhanVien.MA_NQL = PHONGBAN.TRPHG
+--2--
+SELECT TENNV, DCHI
+	FROM NHANVIEN
+	JOIN PHONGBAN ON NHANVIEN.PHG = PHONGBAN.TENPHG
+	WHERE TENPHG = N'Điều Hành'
+--3--
+USE QuanLyDeAn
+GO
+SELECT Dean.TENDA, PHONGBAN.TENPHG, NHANVIEN.HONV, NHANVIEN.TENLOT, NHANVIEN.TENNV, PHONGBAN.NG_NHANCHUC
+	FROM DEAN
+	JOIN PHONGBAN ON DEAN.MADA = PHONGBAN.MAPHG
+	JOIN NHANVIEN ON PHONGBAN.MAPHG= NHANVIEN.MANV
+	WHERE DEAN.DDIEM_DA = N'Nha Trang'
+--4--
+SELECT NHANVIEN.TENNV, THANNHAN.TENTN
+	FROM NHANVIEN
+	JOIN THANNHAN ON NHANVIEN.MANV = THANNHAN.MA_NVIEN
+	WHERE NHANVIEN.PHAI = N'Nữ'
+--5--
+SELECT nhanvien.TENNV AS HoTenNhanVien, nql.TENNV AS HoTenNguoiQuanLy
+	FROM Nhanvien nhanvien
+	JOIN Nhanvien nql ON nhanvien.MA_NQL = nql.MANV;
+--6--
+SELECT nv.TENNV AS 'Ho Ten Nhan Vien', 
+       pb.TENPHG AS 'Ho Ten Truong Phong', 
+       nql.TENNV AS 'Ho Ten Quan Ly' 
+	FROM Nhanvien nv 
+	JOIN Phongban pb ON nv.PHG = pb.MAPHG 
+	JOIN Nhanvien nql ON nv.MA_NQL = nql.MANV 
+--7--
+SELECT NV.TENNV, NV.MA_NQL, PB.TENPHG AS TENPHG_QUANLY
+	FROM Nhanvien NV
+	INNER JOIN Phongban PB ON NV.PHG = PB.MAPHG --ok--
+	INNER JOIN Phancong PC ON NV.MANV = PC.MA_NVIEN --ok--
+	INNER JOIN Dean D ON PC.SODA = D.MADA --ok--
+	WHERE PB.MAPHG = '5' AND D.TENDA = N'Xây dựng nhà máy chế biến thủy sản'
+--8--
+SELECT D.TENDA
+FROM Dean D
+INNER JOIN Phancong PC ON D.MADA = PC.SODA
+INNER JOIN Nhanvien NV ON PC.MA_NVIEN = NV.MANV
+WHERE HONV =N'Trần' AND TENLOT = N'Anh' AND TENNV = N'Tuấn'
+
+-----------------------3.2 GOM NHÓM ----------------
+--19--
+use QuanLyDeAn
+go
+SELECT COUNT(*) AS 'SL Đề án'
+FROM DEAN;
+
+--20--
+SELECT COUNT(*) AS SoLuongDeanNghiencuu
+FROM Dean d
+JOIN Phongban p ON d.phong = p.MAPHG
+WHERE p.TENPHG =N'Nghiên cứu';
+
+--21--
+use QuanLyDeAn
+go
+SELECT AVG(LUONG) AS Lương_trung_bình
+FROM Nhanvien
+WHERE PHAI = N'Nam'
+
+--22--
+use QuanLyDeAn
+go
+SELECT COUNT(*) as so_than_nhan
+FROM ThanNhan
+WHERE MA_NVIEN = (
+  SELECT MANV
+  FROM Nhanvien
+  WHERE HONV = N'Lê' AND TENLOT = N'Thanh' AND TENNV = N'Sang'
+)
+
+--23--
+use QuanLyDeAn
+go
+SELECT Dean.TENDA, SUM(Phancong.THOIGIAN) AS TongGioLamViec
+FROM Dean 
+INNER JOIN Phancong ON Dean.MADA = Phancong.SODA
+GROUP BY Dean.TENDA;
+
+--24--
+use QuanLyDeAn
+go
+SELECT Dean.TENDA, COUNT(*) AS SoNhanVien
+FROM Dean JOIN Phancong ON Dean.MADA = Phancong.SODA
+GROUP BY Dean.TENDA
+
+--25--
+SELECT NV.HONV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS 'Ho ten', COUNT(TN.MA_NVIEN) AS 'So luong than nhan'
+FROM Nhanvien NV
+LEFT JOIN ThanNhan TN ON NV.MANV = TN.MA_NVIEN
+GROUP BY NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV
+
+--26--
+SELECT NV.HONV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS 'Tên nhân viên', COUNT(PC.MA_NVIEN) AS 'Số lượng đề án'
+FROM Nhanvien NV
+LEFT JOIN Phancong PC ON NV.MANV = PC.MA_NVIEN
+GROUP BY NV.MANV, NV.HONV, NV.TENLOT, NV.TENNV
+
+--27--
+SELECT NV.TENNV, COUNT(*) AS SoLuongNhanVienQuanLy
+FROM Nhanvien NV
+WHERE 
+	EXISTS (
+	SELECT * 
+	FROM Nhanvien 
+	WHERE MANV = NV.MA_NQL
+	)
+GROUP BY NV.TENNV 
+
+--28--
+SELECT Phongban.TENPHG, AVG(Nhanvien.LUONG) AS LƯƠNG_TRUNG_BÌNH
+FROM Phongban
+INNER JOIN Nhanvien ON Phongban.MAPHG = Nhanvien.PHG
+GROUP BY Phongban.TENPHG;
+
+--29--
+SELECT TENPHG, COUNT(*) AS SO_LUONG_NHAN_VIEN
+FROM Nhanvien JOIN Phongban ON Nhanvien.PHG = Phongban.MAPHG
+GROUP BY TENPHG
+HAVING AVG(LUONG) > 30000;
+
+--30--
+SELECT Phongban.TENPHG, COUNT(Dean.MADA) AS 'So_luong_de_an'
+FROM Phongban
+INNER JOIN Dean ON Phongban.MAPHG = Dean.phong
+GROUP BY Phongban.TENPHG;
+
+--31--
+SELECT pb.TENPHG, nv.HONV + ' ' + nv.TENLOT + ' ' + nv.TENNV AS TRUONGPHONG, COUNT(d.MADA) AS SO_LUONG_DE_AN
+FROM Phongban pb
+JOIN Nhanvien nv ON nv.PHG = pb.MAPHG
+JOIN Dean d ON d.phong = pb.MAPHG
+GROUP BY pb.TENPHG, nv.HONV, nv.TENLOT, nv.TENNV
+
+--32-- chưa sửa data
+SELECT pb.TENPHG, COUNT(DISTINCT d.MADA) AS So_luong_de_an
+FROM Phongban pb
+INNER JOIN Dean d ON pb.MAPHG = d.phong
+INNER JOIN Nhanvien nv ON pb.MAPHG = nv.PHG
+INNER JOIN Phancong pc ON nv.MANV = pc.MA_NVIEN
+GROUP BY pb.TENPHG
+HAVING AVG(nv.LUONG) > 50000
+
+--33-- oki
+SELECT Dean.DDIEM_DA, COUNT(*) AS SoDeAn 
+FROM Dean 
+GROUP BY Dean.DDIEM_DA
+--34--
+SELECT dean.TENDA, COUNT(phancong.soda) as so_luong_cong_viec
+FROM dean JOIN phancong ON dean.MADA = phancong.SODA
+GROUP BY dean.TENDA
+
+--35--
+SELECT phancong.soda, COUNT(*) AS soluong
+FROM phancong
+WHERE phancong.soda IN (
+    SELECT dean.MADA
+    FROM dean
+    WHERE dean.MADA = 20
+)
+GROUP BY phancong.soda;
+--------------------------------3.3 TRUY VẤN LỒNG + GOM NHÓM ------------------------------
+--36-- chưa sửa data
+SELECT MADA
+FROM Dean
+WHERE MADA IN (SELECT MANV FROM Nhanvien WHERE HONV = N'Lê')
+UNION
+SELECT MADA
+FROM Dean
+WHERE phong IN (SELECT MAPHG FROM Phongban WHERE TRPHG = N'Lê')
+
+--37-- chưa sửa data
+SELECT HONV, TENLOT, TENNV
+FROM Nhanvien
+WHERE MANV IN (
+  SELECT MA_NVIEN
+  FROM ThanNhan
+  GROUP BY MA_NVIEN
+  HAVING COUNT(*) > 2
+)
+
+--38--
+SELECT N.HONV, N.TENLOT, N.TENNV
+FROM Nhanvien N
+LEFT JOIN ThanNhan TN ON N.MANV = TN.MA_NVIEN
+WHERE TN.MA_NVIEN IS NULL;
+--*Sử dụng NOT EXISTS:
+SELECT N.HONV, N.TENLOT, N.TENNV
+FROM Nhanvien N
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM ThanNhan TN
+    WHERE TN.MA_NVIEN = N.MANV
+);
+
+39.
+SELECT NV.HONV AS HONV, NV.TENLOT, NV.TENNV
+FROM Nhanvien NV
+INNER JOIN ThanNhan TN ON NV.MANV = TN.MA_NVIEN
+WHERE NV.PHG IN (
+    SELECT PHG FROM Nhanvien WHERE PHG = NV.PHG AND MA_NQL IS NULL
+)
+GROUP BY NV.HONV, NV.TENLOT, NV.TENNV
+HAVING COUNT(TN.MA_NVIEN) >= 1;
+
+40.
+SELECT DISTINCT HONV, TENLOT, TENNV
+FROM Nhanvien
+LEFT JOIN Phongban ON Nhanvien.PHG = Phongban.MAPHG
+WHERE Phongban.TRPHG = 'Host' AND NOT EXISTS (
+  SELECT *
+  FROM ThanNhan
+  WHERE ThanNhan.MA_NVIEN = Nhanvien.MANV
+)
+
+41.
+SELECT HOSV, TENLOT, TENNV
+FROM Nhanvien
+WHERE LUONG > (
+  SELECT AVG(LUONG)
+  FROM Nhanvien JOIN Phongban ON Nhanvien.PHG = Phongban.MAPHG
+  WHERE Phongban.TENPHG = 'Nhân sự'
+);
+
+42.
+SELECT 
+    pb.TENPHG, nv.HONV, nv.TENLOT, nv.TENNV
+FROM 
+    Phongban pb
+    JOIN Nhanvien nv ON pb.MAPHG = nv.PHG
+WHERE 
+    pb.NG_NHANCHUC = (
+        SELECT 
+            MAX(N.NV)
+        FROM 
+            (
+                SELECT 
+                    COUNT(*) AS NV
+                FROM 
+                    Nhanvien
+                GROUP BY 
+                    PHG
+            ) AS N
+    )
+43.
+*not in:
+SELECT MADA
+FROM Dean
+WHERE MADA NOT IN (
+  SELECT MADA
+  FROM Phancong
+  WHERE ma_nvien = 60
+);
+
+*left join:
+SELECT d.MADA
+FROM Dean d
+LEFT JOIN Phancong p ON d.MADA = p.MA_NVIEN AND p.ma_nvien = 60
+WHERE p.ma_nvien IS NULL;
+
+44.
+SELECT MANV, CONCAT(HOSV, ' ', TENLOT, ' ', TENNV) AS HovaTen, DCHI
+FROM Nhanvien
+INNER JOIN Phancong ON Nhanvien.MANV = Phancong.MA_NVIEN
+INNER JOIN Dean ON Phancong.SODA = Dean.MADA
+INNER JOIN Phongban ON Nhanvien.PHG = Phongban.MAPHG
+WHERE Dean.DDIEM_DA = N'TP.HCM' AND Phongban.TRPHG <> N'TP.HCM'
+
+45.
+SELECT NV.MANV, NV.HOSV + ' ' + NV.TENLOT+  ' ' + NV.TENNV AS HOTEN, NV.DCHI
+FROM Nhanvien NV, Phongban PB, Dean D
+WHERE NV.PHG = PB.MAPHG
+    AND PB.TRPHG != D.DDIEM_DA
+    AND NV.MANV IN (
+        SELECT PC.MA_NVIEN
+        FROM Phancong PC, Dean D
+        WHERE PC.SODA = D.MADA
+            AND D.DDIEM_DA = 'Nha Trang'
+    );
+----------------------------------------------------------------------
+3.5 COMPUTE/COMPUTE BY 
+
+46. 
+SELECT MANV, CONCAT(HOSV, ' ', TENLOT, ' ', TENNV) AS HoTen, DATEDIFF(year, NGSINH, GETDATE()) AS Tuoi
+FROM Nhanvien
+COMPUTE AVG(DATEDIFF(year, NGSINH, GETDATE()))
+
+47.
+SELECT
+    pb.tenphg AS PhongBan,
+    da.tenda AS TenDeAn,
+    AVG(pn.tongluong) AS LuongTrungBinh
+FROM
+    Phongban pb
+INNER JOIN
+    Nhanvien nv ON pb.maphg = nv.PHG
+INNER JOIN
+    Phancong pc ON nv.manv = pc.ma_nvien
+INNER JOIN
+    DEAN da ON pc.soda = da.mada
+LEFT JOIN
+    (
+    SELECT
+        pc.soda,
+        pc.ma_nvien,
+        SUM(nv.luong * pc.thoigian) AS tongluong
+    FROM
+        Phancong pc
+    INNER JOIN
+        Nhanvien nv ON pc.ma_nvien = nv.manv
+    GROUP BY
+        pc.soda,
+        pc.ma_nvien
+    ) pn ON da.mada = pn.soda AND nv.manv = pn.ma_nvien
+GROUP BY
+    pb.tenphg,
+    da.tenda
+--------------------------------------------
+3.4 PHÉP CHIA 
+
+48.
+SELECT
+    nv.manv AS MaNV,
+    nv.phai AS Phai,
+    CONCAT(nv.honv, ' ', nv.tenlot, ' ', nv.tennv) AS HoTen
+FROM
+    Nhanvien nv
+WHERE
+    nv.manv NOT IN (
+        SELECT DISTINCT
+            pc.ma_nvien
+        FROM
+            Phancong pc
+        LEFT JOIN
+            DEAN da ON pc.soda = da.mada
+        WHERE
+            da.mada IS NULL
+    )
+
+49.
+SELECT DISTINCT NV.MANV, NV.PHAI, NV.HOSV + ' ' + NV.TENLOT + ' ' + NV.TENNV AS HoTen
+FROM Nhanvien NV
+JOIN Phancong PC ON NV.MANV = PC.MA_NVIEN
+JOIN Dean D ON PC.SODA = D.MADA
+JOIN Phongban PB ON D.PHONG = PB.MAPHG
+WHERE PB.MAPHG = 5
+
+50.
+

@@ -1,0 +1,126 @@
+Họ và tên: Cao Nguyễn Quốc Lâm
+Lớp: 63. CNTT-4
+MSSV: 63132195
+
+			              Thi Cuối Kỳ Hệ Quản trị CSDL
+					Đề 6
+Câu 1:
+use QuanLyDeAn
+go
+begin
+	declare @contro cursor;
+	set @contro = cursor For
+		SELECT PHONGBAN.TENPHG, NHANVIEN.HONV + ' ' + NHANVIEN.TENLOT + ' ' + NHANVIEN.TENNV, COUNT(DISTINCT DEAN.DDIEM_DA)
+		FROM PHONGBAN
+		JOIN NHANVIEN ON PHONGBAN.MAPHG = NHANVIEN.PHG
+		JOIN DEAN ON NHANVIEN.MANV = DEAN.MADA
+		GROUP BY PHONGBAN.TENPHG, NHANVIEN.HONV, NHANVIEN.TENLOT, NHANVIEN.TENNV;
+		OPEN @contro;
+	--Tạo biến
+	DECLARE @tenphg NVARCHAR(50);
+	DECLARE @hoten NVARCHAR(100);
+	DECLARE @soluong INT;
+	declare @stt int=1; --them so thu tu
+	FETCH NEXT FROM @contro INTO @tenphg, @hoten, @soluong;
+	while (@@FETCH_STATUS = 0)
+		begin
+			print convert(varchar(3),@stt) +'.' + ' Tên phòng ban: ' + @tenphg;
+			print '.' +'   Trưong phòng: ' + @hoten ;
+			print '.'+  ' Tên phòng: ' + @tenphg ;
+			print '.'+ '   So lưong đia điem trien khai đe án: ' + CAST(@soluong AS VARCHAR);
+			Set @stt+=1;
+			FETCH NEXT FROM @contro INTO @tenphg, @hoten, @soluong;
+		end;
+	close @contro;
+	deallocate @contro;
+end;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Câu 2:
+BEGIN TRANSACTION;
+
+-- Chuyển nhân viên từ phòng ban Tài chính sang Kế toán
+UPDATE NHANVIEN
+SET PHG = N'Kế Toán'
+WHERE MANV = '666' AND PHG = N'Tài chính';
+
+-- Thêm nhân viên mới làm trưởng phòng Tài chính
+DECLARE @newMaNV VARCHAR(10);
+DECLARE @newHoNV VARCHAR(50);
+DECLARE @newTenLot VARCHAR(50);
+DECLARE @newTenNV VARCHAR(50);
+DECLARE @newMaNQL VARCHAR(10);
+DECLARE @newPhg VARCHAR(50);
+
+SET @newMaNV = 666;
+SET @newHoNV = 'Nguyen';
+SET @newTenLot = 'Van';
+SET @newTenNV = 'A';
+SET @newMaNQL = 'MADA123';
+SET @newPhg = 'Tài chính';
+
+INSERT INTO NHANVIEN (MANV, HONV, TENLOT, TENNV, MA_NQL, PHG)
+VALUES (@newMaNV, @newHoNV, @newTenLot, @newTenNV, @newMaNQL, @newPhg);
+
+COMMIT;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Câu 3:
+CREATE TRIGGER Trg_KiemSoatPhanCong
+ON PHANCONG
+AFTER INSERT, UPDATE
+AS
+BEGIN
+	-- Kiểm tra số lượng đề án mà nhân viên nữ tham gia
+	IF EXISTS (
+		SELECT PHANCONG.MA_NVIEN, COUNT(*) AS SoLuongDeAn
+		FROM PHANCONG
+		JOIN NHANVIEN ON PHANCONG.MA_NVIEN = NHANVIEN.MANV
+		WHERE NHANVIEN.PHAI = N'Nữ'
+		GROUP BY PHANCONG.MA_NVIEN
+		HAVING COUNT(*) > 3
+	)
+	BEGIN
+		-- Nếu có nhân viên nữ tham gia quá 3 đề án, hủy thao tác và hiển thị thông báo lỗi
+		ROLLBACK TRANSACTION
+		RAISERROR('Nhân viên nữ không được tham gia quá 3 đề án', 16, 1)
+		RETURN
+	END
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Câu 4: 
+
+CREATE PROCEDURE XuatDuLieuPhongBan1
+	@MaPhongBan NVARCHAR(50)
+AS
+BEGIN
+	SELECT pb.TENPHG, COUNT(nv.MANV) AS TONG_NQL
+	FROM PHONGBAN pb
+	LEFT JOIN NHANVIEN nv ON pb.MAPHG = nv.MA_NQL
+	WHERE pb.MAPHG = 10
+	GROUP BY pb.TENPHG;
+END
+
+-- câu lệnh chạy thủ tục trên--
+EXEC XuatDuLieuPhongBan1 @MaPhongBan= 10
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Câu 5:
+alter FUNCTION GetManagerNameForEmployeee(@ma_nv NVARCHAR(10))
+RETURNS VARCHAR(255)
+AS
+BEGIN
+    DECLARE @ten_tp NVARCHAR(255)
+    SELECT TOP 1 @ten_tp = CONCAT(nv.HONV, ' ', nv.TENLOT, ' ', nv.TENNV)
+    FROM NHANVIEN nv
+    INNER JOIN PHANCONG pc ON nv.MANV = pc.MA_NVIEN
+    INNER JOIN DEAN d ON nv.MA_NQL = d.MADA
+    WHERE nv.MANV = @ma_nv
+    GROUP BY nv.HONV, nv.TENLOT, nv.TENNV
+    ORDER BY COUNT(pc.SODA) DESC
+    RETURN @ten_tp
+END
+
+-- câu lệnh chạy hàm trên--
+SELECT dbo.GetManagerNameForEmployeee('13') AS HoTenTruongPhong
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------

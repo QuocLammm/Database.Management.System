@@ -1,0 +1,101 @@
+1.Tạo CSDL QuanLySinhVien_HoTenSV:
+CREATE DATABASE QuanLySinhVien_CaoNguyenQuocLam;
+
+2.
+USE master;
+CREATE LOGIN HoTenSV WITH PASSWORD = 'your_password';
+USE QuanLySinhVien_CaoNguyenQuocLam;
+CREATE USER HoTenSV_qlsv FOR LOGIN CaoNguyenQuocLam;
+GRANT CREATE TABLE TO CaoNguyenQuocLam_qlsv;
+GRANT ALTER TABLE TO CaoNguyenQuocLam_qlsv;
+GRANT CREATE VIEW TO CaoNguyenQuocLam_qlsv;
+GRANT ALTER VIEW TO CaoNguyenQuocLam_qlsv;
+GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::dbo TO CaoNguyenQuocLam_qlsv;
+
+3.
+CREATE TABLE SinhVien (
+    MaSV INT PRIMARY KEY,
+    HoSV VARCHAR(50),
+    TenSV VARCHAR(50),
+    GioiTinh NVARCHAR(10),
+    DiaChi NVARCHAR(100),
+    Email NVARCHAR(100),
+    NgaySinh DATE
+);
+
+INSERT INTO SinhVien VALUES
+(SV01, 'Nguyen Van','An', 'Nam','Ha Noi', 'nguyenvana@gmail.com','2000-01-01'),
+(SV02, 'Tran Thi','Binh', 'Nu', 'Ho Chi Minh', 'tranthib@gmail.com','2001-02-02'),
+(SV03, 'Cao Nguyen Quoc','Lam', 'Nam', 'Da Nang', 'lam.cnq.63CNTT@ntu.deu.vn','2003-06-10');
+
+
+CREATE TABLE MonHoc (
+    MaMH INT PRIMARY KEY,
+    TenMH NVARCHAR(50),
+    SoTC INT
+);
+
+INSERT INTO MonHoc VALUES
+(001, 'He quan tri co so du lieu', 3),
+(002, 'Toan roi rac', 4),
+(003, 'Lap Trinh C#', 3);
+
+
+CREATE TABLE KeTQua (
+    NamHoc INT,
+    MaSV INT,
+    MaMH INT,
+    Diem FLOAT,
+    CONSTRAINT FK_SV FOREIGN KEY (MaSV) REFERENCES SinhVien (MaSV),
+    CONSTRAINT FK_MH FOREIGN KEY (MaMH) REFERENCES MonHoc (MaMH)
+);
+
+INSERT INTO DangKyHoc VALUES
+(2020,SV01, 001, 8.5),
+(2021,SV01, 002, 7.5),
+(2020,SV02, 001, 9.5),
+(2021,SV02, 002, 6.5),
+
+4.
+CREATE SCHEMA ntu;
+
+ALTER SCHEMA ntu TRANSFER dbo.SinhVien
+
+5.
+SELECT MaSV, HoSV, TenSV, DiaChi, Email
+FROM SinhVien
+WHERE GioiTinh = 'Nữ';
+
+6.
+SELECT MaSV, CONCAT(HoSV, ' ', TenSV) AS HoTen, NgaySinh
+FROM SinhVien
+WHERE DATEDIFF(YEAR, NgaySinh, GETDATE()) >= 19;
+
+7.
+USE DATABASE QuanLySinhVien_CaoNguyenQuocLam;
+go
+SELECT s.MaSV, s.HoSV, s.TenSV, SUM(d.SoTC) AS TongTinChi
+FROM SinhVien s
+INNER JOIN KetQua d ON s.MaSV = d.MaSV
+WHERE s.GioiTinh = N'Nữ'
+GROUP BY s.MaSV, s.HoSV, s.TenSV;
+
+8.
+UPDATE MonHoc
+SET SoTC = SoTC + 1;
+
+9.
+USE DATABASE QuanLySinhVien_CaoNguyenQuocLam;
+go
+SELECT sv.MaSV, sv.HoTen, SUM(dk.SoTC) AS TongTinChi
+FROM SinhVien sv
+INNER JOIN DangKyHocPhan dk ON sv.MaSV = dk.MaSV
+WHERE sv.GioiTinh = N'Nữ'
+GROUP BY sv.MaSV, sv.HoTen
+HAVING SUM(dk.SoTC) > 4;
+
+10.
+SELECT MaMH, TenMH, SoTC
+FROM MonHoc
+GROUP BY SoTC
+HAVING COUNT(*) > 1

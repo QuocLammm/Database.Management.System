@@ -1,0 +1,99 @@
+I. Tổng quan
+
+1. CSDL là gì: Tổ chức và lưu trữ các dữ liệu liên quan đến nhau trên một hoặc nhiều thiết bị
+ lưu trữ để đáp ứng nhu cầu quản lý và truy xuất dữ liệu của các ứng dụng.
+
+-Để làm gì: tổ chức, lưu trữ, quản lý và truy xuất các dữ liệu liên quan đến nhau của các ứng dụng
+ trong nhiều lĩnh vực khác nhau, bao gồm kinh doanh, y tế, giáo dục, khoa học và công nghệ thông tin. 
+
+-Mô hình phổ biến hiện tại là : mô hình dữ liệu Quan hệ
+
+-Cấu trúc tổ chức: Data được tổ chức thành từng bảng, trong mỗi bảng có 1 khóa chính và nhiều trường,
+liên kết với các bảng khác bằng khóa ngoại.
+
+2.Hệ QTCSDL là gì: là một phần mềm được sử dụng để quản lý và truy xuất cơ sở dữ liệu.
+
+-Để làm gì: để quản lý và truy xuất các cơ sở dữ liệu, bao gồm việc thiết kế, tạo, sửa đổi, xóa và truy xuất dữ liệu từ các cơ sở dữ liệu.
+ Nó cung cấp các công cụ và tính năng để quản lý và bảo vệ dữ liệu, cải thiện hiệu suất và đáp ứng nhu cầu của các ứng dụng.
+
+-Cấu trúc tổng quát : 3 phần: giao diện , bộ quản lý lưu trữ và bộ xử lý truy vấn.
+
+-SQL Server: database enzin chính không thể thay thế, SQL manager server studio là 1 ứng dụng có thể thay thế.
+
+3.Ngôn ngữ SQL(Viết tắt của:Structured Query Language)
+-SQL dùng để làm gì:SQL là ngôn ngữ dùng để truy vấn, thêm, sửa đổi và xóa dữ liệu trong cơ sở dữ liệu.
+- Truy vấn là gì: Truy vấn trong SQL Server là việc truy xuất và lấy dữ liệu từ cơ sở dữ liệu bằng sử dụng ngôn ngữ SQL
+-Các câu lệnh thao tác: mở, sửa xóa,.....
+-Nhóm lệnh: DDL(định nghĩa DL), DML(thêm,sửa, tính toán....)
++Ví dụ: câu lệnh select thuộc nhóm lệnh DML.
++Ví dụ: câu lệnh create, alter,drop, Reaname,...
+
+4.Tổ chức data cho SQL Server:
+-Tổ chức data có mấy lớp? (3 lớp)
++lớp ngoài (nhìn thấy được)
++lớp logic
++lớp vật lý
+-Tổ chức vật lý: 1 file .mdf ( file data chính )
+		+.ndf(phải là filegruop khác)
+		+.ldf
++filegroup là gì?(một tập hợp các file dữ liệu liên quan đến nhau về mặt vật lý được
+ tổ chức để lưu trữ các đối tượng của cơ sở dữ liệu như bảng, chỉ mục, chế độ xem,
+ thủ tục lưu trữ và hàm.)- (primary luôn chứa file .mdf chỉ nằm trong này thôi !!!)
++.ldf không thuộc filegroup nào.
+-Tổ chức logic:
++Đối tượng CSDL: Đối tượng CSDL là tập hợp các thực thể, mối quan hệ và thuộc tính trong một hệ thống quản lý cơ sở dữ liệu.
++Schema(gom nhóm các đối tượng logic)
++
+
+5.Các kiểu dữ liệu:
+-Ví dụ nhập tên mình vào SQL dùng câu lệnh nào? ( )
+-Ví dụ tạo CSDL cho  1 công ty có bảng lương , lương có kiểu dữ liệu là gì? (decimal)
+-Ví dụ: '2023-11-4'- theo fomat 'năm-tháng-ngày'
+-NUMMORIC / DECIMAL
+-NVARCHAR / VARCHAR
+-Date
+
+6.Lệnh - Cú pháp- Sử dụng CSDL:
+
+7.Sao Lưu -Khôi phục:
+-Quy trình: 
++sao lưu full: Kết quả( ví dụ cơm chín)
++sao lưu different: ( sao lưu full gần nhất)
++sao lưu log: Quy trình (ví dụ cách nấu cơm)
+
+8.Quyền
+-Quyền là gì?-Giới hạn 1 thao tác mà người dùng sử dụng được trong 1 thao tác
+-Role là gì ?- Tạo nhóm tập hợp các quyềns	
+
+9.Quy trình tại Tk cho ứng dụng:
+    Admin(quyền)     -Login( tạo quyền đăng nhập được, tạo trên CSDL master)
+                                -User(tạo quyền sử dụng )
+
+II.Lập trình:
+
+1.Ngôn ngữ: T-SQL (Là ngôn ngữ truy vấn-không phải ngôn ngữ lập trình: không hỗ trợ cấu trúc phân luồng: else, if)
+
+2.Khai báo biến.
++declare @a varchar(20)
+-Gán giá trị cho biến: 2 cách
++Dùng set: ví dụ x=2;
++Dùng select:
+
+3. Cấu trúc chương trình: 
+begin
+
+end,
+
+4.Con trỏ(ko thi)
+
+5.Trigger:
+-Thao tác user trên CSDL
+-Phân loại: 
++DMl (xãy ra khi insert, delete)
++DDL
++login
+
+6.Transition: chỉ các thao tác / không có thao tác nào/ 
+
+7. Go: ghép nối các khối lệnh liên tục.
+

@@ -1,0 +1,103 @@
+Họ và tên: Cao Nguyễn Quốc Lâm
+Lớp: 63.CNTT-4
+-------------------------------------------------
+Câu 1: 
+CREATE DATABASE QuanLyLaixe_CaoNguyenQuocLam;
+-------------------------------------------------
+
+Câu 2:
+CREATE LOGIN admin_CaoNguyenQuocLam WITH PASSWORD = '100603', CHECK_POLICY = OFF;
+
+USE QuanLyLaixe_CaoNguyenQuocLam;
+GO
+CREATE USER user_CaoNguyenQuocLam FOR LOGIN admin_CaoNguyenQuocLam;
+USE QuanLyLaixe_CaoNguyenQuocLam;
+GO
+GRANT CREATE TABLE TO user_CaoNguyenQuocLam;
+GRANT CREATE VIEW TO user_CaoNguyenQuocLamn;
+GRANT ALTER TO user_CaoNguyenQuocLam;
+GRANT SELECT, INSERT, UPDATE, DELETE TO user_CaoNguyenQuocLam;
+
+-------------------------------------------------
+
+Câu 3:
+CREATE TABLE LaiXe (
+    MaLX VARCHAR(100) PRIMARY KEY,
+    Ho VARCHAR(50),
+    Ten VARCHAR(50),
+    GioiTinh NVARCHAR(10),
+    DiaChi NVARCHAR(100),
+    SDT NUMERIC(10,0),
+);
+INSERT INTO LaiXe VALUES
+('CN01', 'Nguyen Van','An', 'Nam','Nha Trang- Khánh Hòa',012345678),
+('LT02', 'Tran Thi','Binh', 'Nu','Nha Trang- Khánh Hòa',012345678),
+('SQ03', 'Cao Nguyen Quoc','Lam', 'Nam','Nha Trang- Khánh Hòa',012345678 );
+
+CREATE TABLE Xe (
+    MaXe VARCHAR(100) PRIMARY KEY,
+	LoaiXe VARCHAR(100),
+	TaiTrong INT,
+    TGKD DATE,
+    PhiVC INT,
+);
+
+INSERT INTO Xe VALUES
+('79A-03219', 'Xe tải Kazma', 15,'2022-12-6',1000.000),
+('79A-99999', 'Toyota Hilux', 10,'2022-12-6',2000.000),
+('79A-88888', 'Mecserdes', 12,'2022-12-6',4000.000);
+
+CREATE TABLE VanTai (
+	MaLX VARCHAR(100),
+	MaXe VARCHAR(100),
+	NgayVC VARCHAR(100)  PRIMARY KEY,
+	SoKM INT,
+	TrongLuong INT,
+	CONSTRAINT pk_LX FOREIGN KEY (MaLX) REFERENCES LaiXe (MaLX),
+	CONSTRAINT pk_MX FOREIGN KEY (MaXe) REFERENCES Xe (MaXe),
+);
+INSERT INTO VanTai VALUES
+('CN01', '79A-03219', '15-10-2020',100,15),
+('LT02', '79A-99999', '25-10-2020',150,10),
+('SQ03', '79A-88888', '10-10-2020',180,12);
+-------------------------------------------------
+
+Câu 4:
+-------------------------------------------------
+
+Câu 5:
+SELECT *
+FROM LaiXe
+WHERE GioiTinh = 'Nu';
+-------------------------------------------------
+
+Câu 6:
+SELECT LaiXe.Ten, SUM(VanTai.SoKm) AS TongSoKm
+FROM LaiXe 
+INNER JOIN VanTai ON LaiXe.MaLX = VanTai.MaLX
+WHERE YEAR(VanTai.NgayVC) = 2022
+GROUP BY LaiXe.Ten;
+-------------------------------------------------
+
+Câu 7:
+UPDATE XE
+SET PhiVC = PhiVC * 1.1
+WHERE TaiTrong > 10;
+-------------------------------------------------
+
+Câu 8:
+SELECT MaLX, Ho, Ten
+FROM LaiXe
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM XE s
+    WHERE s.MaXE = d.MaXE
+    AND YEAR(s.NgayVC) = 2022
+)
+-------------------------------------------------
+
+Câu 9:
+-------------------------------------------------
+
+Câu 10:
+-------------------------------------------------
